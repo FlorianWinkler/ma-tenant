@@ -5,7 +5,7 @@ router.get('/', function(req, res, next) {
     let min=0;
     let max=100;
     let num=100;
-    console.log("Config: min="+min+", max="+max+", num="+num);
+    //console.log("Config: min="+min+", max="+max+", num="+num);
     let numbers = [];
     for(let i=0;i<num;i++){
         numbers.push(randomNumber(min,max));
