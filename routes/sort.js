@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
+let reqcounter = 0;
+
 router.get('/', function(req, res, next) {
+    reqcounter++;
     let min=0;
     let max=100;
     let num=100;
@@ -12,9 +15,11 @@ router.get('/', function(req, res, next) {
     }
     numbers.sort(compareNumber);
     //console.log(numbers);
+    var child_process = require("child_process");
 
     res.json({
-        hostname: req.hostname,
+        hostname: req.headers.host,
+        requestCtr: reqcounter,
         numbers: numbers
     });
 });
