@@ -13,7 +13,10 @@ router.get('/', function(req, res, next) {
     numbers.sort(compareNumber);
     //console.log(numbers);
 
-    res.json(numbers);
+    res.json({
+        hostname: req.hostname,
+        numbers: numbers
+    });
 });
 
 function randomNumber(min,max){
