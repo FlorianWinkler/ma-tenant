@@ -22,8 +22,24 @@ router.get('/:count', function(req, res, next) {
     let numbers = doSort(req.params.count);
 
     res.json({
-        hostname: req.headers.host,
+        //hostname: req.headers.host,
         requestCtr: reqcounter,
+        count: req.params.count,
+        numbers: []
+    });
+});
+
+router.get('/:count/:numberResponse', function(req, res, next) {
+    reqcounter++;
+
+    let numbers = doSort(req.params.count);
+    if(req.params.numberResponse === 'false'){
+        numbers=[];
+    }
+    res.json({
+        //hostname: req.headers.host,
+        requestCtr: reqcounter,
+        count: req.params.count,
         numbers: numbers
     });
 });
