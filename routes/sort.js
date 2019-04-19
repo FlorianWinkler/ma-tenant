@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
     res.json({
         hostname: req.headers.host,
         requestCtr: reqcounter,
-        numbers: numbers
+        numbers: []
     });
 });
 
