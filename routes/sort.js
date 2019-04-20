@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
+const exec = require('child_process').exec;
+
 let reqcounter = 0;
+let hostname = "unknown_host";
+setHostname();
 
 router.get('/', function(req, res, next) {
     reqcounter++;
@@ -9,8 +13,9 @@ router.get('/', function(req, res, next) {
 
     let numbers = doSort(1000);
 
+    //console.log(hostname);
     res.json({
-        hostname: req.headers.host,
+        hostname: hostname,
         requestCtr: reqcounter,
         numbers: []
     });
@@ -22,7 +27,7 @@ router.get('/:count', function(req, res, next) {
     let numbers = doSort(req.params.count);
 
     res.json({
-        //hostname: req.headers.host,
+        hostname: hostname,
         requestCtr: reqcounter,
         count: req.params.count,
         numbers: []
@@ -37,7 +42,7 @@ router.get('/:count/:numberResponse', function(req, res, next) {
         numbers=[];
     }
     res.json({
-        //hostname: req.headers.host,
+        hostname: hostname,
         requestCtr: reqcounter,
         count: req.params.count,
         numbers: numbers
@@ -62,6 +67,13 @@ function randomNumber(min,max){
 
 function compareNumber(a,b){
     return a-b;
+}
+
+function setHostname(){
+    exec('hostname', function (error, stdOut, stdErr) {
+        console.log(stdOut);
+        hostname = stdOut;
+    });
 }
 
 module.exports = router;
