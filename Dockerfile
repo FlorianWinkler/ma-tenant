@@ -22,6 +22,6 @@ EXPOSE 3000
 EXPOSE 27017
 EXPOSE 28017
 
-CMD [ "mongod", "--fork", "--logpath", "/var/log/mongod.log"]
+#CMD [ "mongod", "--fork", "--logpath", "/var/log/mongod.log"]
 CMD [ "npm", "start" ]
 
