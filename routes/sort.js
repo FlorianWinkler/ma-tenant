@@ -12,15 +12,11 @@ let insertcounter = 0;
 let hostname = "unknown_host";
 let dbUrl = "mongodb://10.0.0.70:27017/sortdb";
 setHostname();
-let mongo;
-// getDatabaseConnection(function(db){
-//    mongo = db;
-// });
+let mongo=null;
 
 router.get('/', function(req, res, next) {
     reqcounter++;
 
-    console.log("test");
     let numbers = doSort(1000);
     console.log(numbers);
     insertDocument(numbers);
@@ -89,51 +85,72 @@ function doSort(count){
 }
 
 function insertDocument(numbers){
-    mongo.open(function(err, db) {
-        assert.equal(null, err);
-        var collection = db.collection('sort');
-        collection.insertOne({
-            _id: hostname+":"+insertcounter,
-            list: numbers
-        }, function(err, res){
-            assert.equal(err,null);
-            console.log("Inserted sucessfully");
-            insertcounter++;
-            db.close();
+    if(mongo==null){
+        getDatabaseConnection(function(db){
+            mongo = db;
+            insertDocument(numbers);
         });
-    });
+    }else {
+        mongo.open(function (err, db) {
+            assert.equal(null, err);
+            var collection = db.collection('sort');
+            collection.insertOne({
+                _id: hostname + ":" + insertcounter,
+                list: numbers
+            }, function (err, res) {
+                assert.equal(err, null);
+                console.log("Inserted sucessfully");
+                insertcounter++;
+                db.close();
+            });
+        });
+    }
 }
 
 function findAllDocuments(callback){
-    mongo.open(function(err, db) {
-        assert.equal(null, err);
-        var collection = db.collection('sort');
-        collection.find({}).toArray(function(err, docs) {
-            assert.equal(err, null);
-            console.log("Found the following records");
-            console.log(docs);
-            db.close();
-            callback(docs);
+    if(mongo==null){
+        getDatabaseConnection(function(db){
+            mongo = db;
+            findAllDocuments(callback);
         });
-    });
+    }else {
+        mongo.open(function (err, db) {
+            assert.equal(null, err);
+            var collection = db.collection('sort');
+            collection.find({}).toArray(function (err, docs) {
+                assert.equal(err, null);
+                console.log("Found the following records");
+                console.log(docs);
+                db.close();
+                callback(docs);
+            });
+        });
+    }
 }
 
 function findLastDoc(callback){
-    mongo.open(function(err, db) {
-        assert.equal(null, err);
-        var collection = db.collection('sort');
-        let queryObj = {
-            _id: hostname + ":" + (insertcounter-1)
-        };
-        console.log("find doc: "+queryObj._id);
-        collection.find(queryObj).toArray(function(err, docs) {
-            assert.equal(err, null);
-            console.log("Found the following records");
-            console.log(docs);
-            db.close();
-            callback(docs);
+    if(mongo==null){
+        getDatabaseConnection(function(db){
+            mongo = db;
+            findLastDoc(callback);
         });
-    });
+    }else {
+        mongo.open(function (err, db) {
+            assert.equal(null, err);
+            var collection = db.collection('sort');
+            let queryObj = {
+                _id: hostname + ":" + (insertcounter - 1)
+            };
+            console.log("find doc: " + queryObj._id);
+            collection.find(queryObj).toArray(function (err, docs) {
+                assert.equal(err, null);
+                console.log("Found the following records");
+                console.log(docs);
+                db.close();
+                callback(docs);
+            });
+        });
+    }
 }
 
 function getDatabaseConnection(callback){
