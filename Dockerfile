@@ -24,6 +24,6 @@ EXPOSE 27017
 EXPOSE 28017
 
 
-CMD [ "mongod", "--bind_ip_all", "--fork", "--logpath", "/var/log/mongod.log"]
-CMD [ "npm", "start" ]
-
+#CMD [ "mongod", "--bind_ip_all", "--fork", "--logpath", "/var/log/mongod.log"]
+#CMD [ "npm", "start" ]
+CMD ["ash", "run.sh"]
