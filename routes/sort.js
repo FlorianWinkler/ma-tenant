@@ -40,7 +40,7 @@ router.get('/count/:count', function(req, res, next) {
     });
 });
 
-router.get('/:count/:numberResponse', function(req, res, next) {
+router.get('/count/:count/:numberResponse', function(req, res, next) {
     reqcounter++;
 
     let numbers = doSort(req.params.count);
@@ -184,7 +184,7 @@ function compareNumber(a,b){
 function setHostname(){
     exec('hostname', function (error, stdOut, stdErr) {
         hostname = stdOut.trim();
-        console.log("Hostname set to: "+stdOut);
+        console.log("Hostname set to: "+hostname);
     });
 }
 module.exports = router;
