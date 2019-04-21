@@ -13,9 +13,9 @@ let hostname = "unknown_host";
 let dbUrl = "mongodb://10.0.0.70:27017/sortdb";
 setHostname();
 let mongo;
-getDatabaseConnection(function(db){
-   mongo = db;
-});
+// getDatabaseConnection(function(db){
+//    mongo = db;
+// });
 
 router.get('/', function(req, res, next) {
     reqcounter++;

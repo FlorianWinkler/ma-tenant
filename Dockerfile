@@ -10,6 +10,8 @@ COPY package*.json ./
 
 RUN npm install
 RUN apk add --no-cache mongodb
+RUN mkdir -p /data/db && \
+    chown -R mongodb /data/db
 
 # If you are building your code for production
 # RUN npm ci --only=production
@@ -22,5 +24,6 @@ EXPOSE 27017
 EXPOSE 28017
 
 
-#CMD [ "npm", "start" ]
+CMD [ "mongod", "--fork", "--logpath", "/var/log/mongod.log"]
+CMD [ "npm", "start" ]
 
