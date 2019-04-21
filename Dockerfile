@@ -16,6 +16,8 @@ apk add --no-cache mongodb
 # Bundle app source
 COPY . .
 
-EXPOSE 3000
+EXPOSE 3000 27017 28017
+
 CMD [ "npm", "start" ]
 CMD [ "mongod", "--bind-ip", "0.0.0.0" ]
+
