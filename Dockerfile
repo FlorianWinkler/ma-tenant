@@ -8,16 +8,20 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY package*.json ./
 
-RUN npm install \
-apk add --no-cache mongodb
+RUN npm install
+RUN apk add --no-cache mongodb
+RUN mkdir -p /data/db && \
+    chown -R mongodb /data/db
 # If you are building your code for production
 # RUN npm ci --only=production
 
 # Bundle app source
 COPY . .
 
-EXPOSE 3000 27017 28017
+EXPOSE 3000
+EXPOSE 27017
+EXPOSE 28017
 
 CMD [ "npm", "start" ]
-CMD [ "mongod", "--bind-ip", "0.0.0.0" ]
+CMD [ "mongod"]
 
