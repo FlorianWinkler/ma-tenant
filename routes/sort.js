@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const TableStorage = require ('../src/TableStorage');
-const azure = require('azure-storage');
 const exec = require('child_process').exec;
 const MongoClient = require("mongodb").MongoClient;
 const assert = require("assert");
@@ -10,15 +8,16 @@ const assert = require("assert");
 let reqcounter = 0;
 let insertcounter = 0;
 let hostname = "unknown_host";
-let dbUrl = "mongodb://localhost:27017/sortdb";
+let dbUrl = "mongodb://10.0.0.81:27017/sortdb";
 setHostname();
-let mongo=null;
+setTimeout(dropSortDatabase,2000);
+let sortdb=null;
 
 router.get('/', function(req, res, next) {
     reqcounter++;
 
     let numbers = doSort(1000);
-    console.log(numbers);
+    // console.log(numbers);
     insertDocument(numbers);
     res.json({
         hostname: hostname,
@@ -85,92 +84,69 @@ function doSort(count){
 }
 
 function insertDocument(numbers){
-    if(mongo==null){
-        getDatabaseConnection(function(db){
-            mongo = db;
-            insertDocument(numbers);
-        });
-    }else {
-        mongo.open(function (err, db) {
+    getDatabaseConnection(function (err, conn) {
             assert.equal(null, err);
-            var collection = db.collection('sort');
+            var collection = conn.collection('sort');
             collection.insertOne({
                 _id: hostname + ":" + insertcounter,
                 list: numbers
             }, function (err, res) {
                 assert.equal(err, null);
-                console.log("Inserted sucessfully");
+                // console.log("Inserted sucessfully");
                 insertcounter++;
-                db.close();
+                conn.close();
             });
         });
-    }
 }
 
-function findAllDocuments(callback){
-    if(mongo==null){
-        getDatabaseConnection(function(db){
-            mongo = db;
-            findAllDocuments(callback);
-        });
-    }else {
-        mongo.open(function (err, db) {
-            assert.equal(null, err);
-            var collection = db.collection('sort');
-            collection.find({}).toArray(function (err, docs) {
-                assert.equal(err, null);
-                console.log("Found the following records");
-                console.log(docs);
-                db.close();
-                callback(docs);
-            });
-        });
-    }
-}
-
-function findLastDoc(callback){
-    if(mongo==null){
-        getDatabaseConnection(function(db){
-            mongo = db;
-            findLastDoc(callback);
-        });
-    }else {
-        mongo.open(function (err, db) {
-            assert.equal(null, err);
-            var collection = db.collection('sort');
-            let queryObj = {
-                _id: hostname + ":" + (insertcounter - 1)
-            };
-            console.log("find doc: " + queryObj._id);
-            collection.find(queryObj).toArray(function (err, docs) {
-                assert.equal(err, null);
-                console.log("Found the following records");
-                console.log(docs);
-                db.close();
-                callback(docs);
-            });
-        });
-    }
-}
-
-function getDatabaseConnection(callback){
-    MongoClient.connect(dbUrl, function(err, db) {
+function findAllDocuments(callback) {
+    getDatabaseConnection(function (err, conn) {
         assert.equal(null, err);
-        db.dropDatabase();
-        console.log("Dropped sortdb");
-        MongoClient.connect(dbUrl, function(err, db) {
-            assert.equal(null, err);
-            console.log("Connected successfully to mongodb");
-            db.close();
-            callback(db);
+        var collection = conn.collection('sort');
+        collection.find({}).toArray(function (err, docs) {
+            assert.equal(err, null);
+            // console.log("Found the following records");
+            // console.log(docs);
+            conn.close();
+            callback(docs);
         });
     });
 }
 
-async function setupTable(){
-    sortTable = new TableStorage(hostname+"");
-    console.log("Hostname for table: "+hostname);
-    await sortTable.createTableIfNotExists();
+function findLastDoc(callback) {
+    getDatabaseConnection(function (err, conn) {
+        assert.equal(null, err);
+        var collection = conn.collection('sort');
+        let queryObj = {
+            _id: hostname + ":" + (insertcounter - 1)
+        };
+        // console.log("find doc: " + queryObj._id);
+        collection.find(queryObj).toArray(function (err, docs) {
+            assert.equal(err, null);
+            // console.log("Found the following records");
+            // console.log(docs);
+            conn.close();
+            callback(docs);
+        });
+    });
+}
+
+function getDatabaseConnection(callback){
+    MongoClient.connect(dbUrl, function (err, connection) {
+        assert.equal(null, err);
+        //console.log("Connected successfully to mongodb");
+        //connection.close();
+        //sortdb = connection;
+        callback(err, connection);
+    });
+}
+
+function dropSortDatabase() {
+    MongoClient.connect(dbUrl, function (err, connection) {
+        assert.equal(null, err);
+        connection.dropDatabase();
+        console.log("Dropped sortdb");
+    });
 }
 
 function randomNumber(min,max){
