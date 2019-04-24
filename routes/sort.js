@@ -91,10 +91,18 @@ function insertDocument(numbers){
                 _id: hostname + ":" + insertcounter,
                 list: numbers
             }, function (err, res) {
-                assert.equal(err, null);
-                // console.log("Inserted sucessfully");
-                insertcounter++;
-                conn.close();
+                if(err != null && err.code === 11000){
+                    conn.close();
+                    //console.log(err);
+                    console.log("Caught duplicate Key error while writing document! Retry...");
+                    insertDocument(numbers);
+               }
+                else {
+                    assert.equal(err, null);
+                    // console.log("Inserted sucessfully");
+                    insertcounter++;
+                    conn.close();
+               }
             });
         });
 }
