@@ -8,10 +8,11 @@ const assert = require("assert");
 let reqcounter = 0;
 let insertcounter = 0;
 let hostname = "unknown_host";
-let dbUrl = "mongodb://10.0.0.81:27017/sortdb";
+let dbUrl = "mongodb://127.0.0.1:27017/sortdb";
+let mongodbConn=null;
+
 setHostname();
-setTimeout(dropSortDatabase,2000);
-let sortdb=null;
+setTimeout(prepareSortDatabase,1000);
 
 router.get('/', function(req, res, next) {
     reqcounter++;
@@ -39,10 +40,11 @@ router.get('/count/:count', function(req, res, next) {
     });
 });
 
-router.get('/count/:count/:numberResponse', function(req, res, next) {
+router.get('/count/:count/:numberResponse', function(req, res) {
     reqcounter++;
 
     let numbers = doSort(req.params.count);
+    insertDocument(numbers);
     if(req.params.numberResponse === 'false'){
         numbers=[];
     }
@@ -54,7 +56,7 @@ router.get('/count/:count/:numberResponse', function(req, res, next) {
     });
 });
 
-router.get('/readall', function(req, res, next) {
+router.get('/readall', function(req, res) {
     reqcounter++;
 
     //console.log("Config: min="+min+", max="+max+", num="+num);
@@ -63,9 +65,8 @@ router.get('/readall', function(req, res, next) {
     });
 });
 
-router.get('/readlast', function(req, res, next) {
+router.get('/readlast', function(req, res) {
     reqcounter++;
-
     //console.log("Config: min="+min+", max="+max+", num="+num);
     findLastDoc(docs => {
         res.json(docs);
@@ -84,46 +85,41 @@ function doSort(count){
 }
 
 function insertDocument(numbers){
-    getDatabaseConnection(function (err, conn) {
-            assert.equal(null, err);
+    getDatabaseConnection(function (conn) {
             var collection = conn.collection('sort');
             collection.insertOne({
                 _id: hostname + ":" + insertcounter,
                 list: numbers
             }, function (err, res) {
                 if(err != null && err.code === 11000){
-                    conn.close();
+                    //conn.close();
                     //console.log(err);
-                    console.log("Caught duplicate Key error while writing document! Retry...");
-                    insertDocument(numbers);
+                    //console.log("Caught duplicate Key error while writing document! Retry...");
+                    setTimeout(insertDocument,100,numbers);
                }
                 else {
                     assert.equal(err, null);
                     // console.log("Inserted sucessfully");
                     insertcounter++;
-                    conn.close();
                }
             });
         });
 }
 
 function findAllDocuments(callback) {
-    getDatabaseConnection(function (err, conn) {
-        assert.equal(null, err);
+    getDatabaseConnection(function (conn) {
         var collection = conn.collection('sort');
         collection.find({}).toArray(function (err, docs) {
             assert.equal(err, null);
             // console.log("Found the following records");
             // console.log(docs);
-            conn.close();
             callback(docs);
         });
     });
 }
 
 function findLastDoc(callback) {
-    getDatabaseConnection(function (err, conn) {
-        assert.equal(null, err);
+    getDatabaseConnection(function (conn) {
         var collection = conn.collection('sort');
         let queryObj = {
             _id: hostname + ":" + (insertcounter - 1)
@@ -133,28 +129,32 @@ function findLastDoc(callback) {
             assert.equal(err, null);
             // console.log("Found the following records");
             // console.log(docs);
-            conn.close();
             callback(docs);
         });
     });
 }
 
-function getDatabaseConnection(callback){
-    MongoClient.connect(dbUrl, function (err, connection) {
-        assert.equal(null, err);
-        //console.log("Connected successfully to mongodb");
-        //connection.close();
-        //sortdb = connection;
-        callback(err, connection);
-    });
+function getDatabaseConnection(callback) {
+    if (mongodbConn == null) {
+        MongoClient.connect(dbUrl, function (err, connection) {
+            assert.equal(null, err);
+            mongodbConn = connection;
+            console.log("Retrieved new MongoDB Connection");
+            callback(mongodbConn);
+        });
+    } else {
+        callback(mongodbConn);
+    }
+
 }
 
-function dropSortDatabase() {
-    MongoClient.connect(dbUrl, function (err, connection) {
-        assert.equal(null, err);
-        connection.dropDatabase();
-        console.log("Dropped sortdb");
-    });
+function prepareSortDatabase() {
+    getDatabaseConnection(function(connection) {
+            connection.dropDatabase();
+            console.log("Dropped sortdb");
+            mongodbConn = connection;
+        }
+    );
 }
 
 function randomNumber(min,max){
@@ -166,7 +166,7 @@ function compareNumber(a,b){
 }
 
 function setHostname(){
-    exec('hostname', function (error, stdOut, stdErr) {
+    exec('hostname', function (error, stdOut) {
         hostname = stdOut.trim();
         console.log("Hostname set to: "+hostname);
     });
