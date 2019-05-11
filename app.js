@@ -5,7 +5,8 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const index = require('./routes/index');
-const sort = require('./routes/sort');
+// const sort = require('./routes/sort');
+const user = require('./routes/user');
 
 // Generic application setup
 app.use(logger('dev'));
@@ -15,7 +16,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/', index);
-app.use('/sort', sort);
+// app.use('/sort', sort);
+app.use('/user', user);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
