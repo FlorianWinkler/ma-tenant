@@ -8,8 +8,8 @@ const assert = require("assert");
 let reqcounter = 0;
 let insertcounter = 0;
 let hostname = "unknown_host";
-//let dbUrl = "mongodb://127.0.0.1:27017/sortdb";
-let dbUrl = "mongodb://10.0.0.85:27017/sortdb";
+let dbUrl = "mongodb://127.0.0.1:27017/sortdb";
+//let dbUrl = "mongodb://10.0.0.85:27017/sortdb";
 let mongodbConn=null;
 
 setHostname();
