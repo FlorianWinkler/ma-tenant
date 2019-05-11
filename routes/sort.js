@@ -8,14 +8,26 @@ const assert = require("assert");
 let reqcounter = 0;
 let insertcounter = 0;
 let hostname = "unknown_host";
-let dbUrl = "mongodb://127.0.0.1:27017/sortdb";
-//let dbUrl = "mongodb://10.0.0.85:27017/sortdb";
+//let dbUrl = "mongodb://127.0.0.1:27017/sortdb";
+let dbUrl = "mongodb://10.0.0.85:27017/sortdb";
 let mongodbConn=null;
 
 setHostname();
 setTimeout(prepareSortDatabase,1000);
 
-router.get('/', function(req, res, next) {
+router.get('/sortonly', function(req, res) {
+    reqcounter++;
+
+    let numbers = doSort(1000);
+    // console.log(numbers);
+    res.json({
+        hostname: hostname,
+        requestCtr: reqcounter,
+        numbers: numbers
+    });
+});
+
+router.get('/sortwrite', function(req, res) {
     reqcounter++;
 
     let numbers = doSort(1000);
@@ -24,11 +36,23 @@ router.get('/', function(req, res, next) {
     res.json({
         hostname: hostname,
         requestCtr: reqcounter,
-        numbers: []
+        numbers: numbers
     });
 });
 
-router.get('/count/:count', function(req, res, next) {
+router.get('/sortonly/count/:count', function(req, res) {
+    reqcounter++;
+
+    let numbers = doSort(req.params.count);
+    res.json({
+        hostname: hostname,
+        requestCtr: reqcounter,
+        count: req.params.count,
+        numbers: numbers
+    });
+});
+
+router.get('/sortwrite/count/:count', function(req, res) {
     reqcounter++;
 
     let numbers = doSort(req.params.count);
@@ -37,16 +61,16 @@ router.get('/count/:count', function(req, res, next) {
         hostname: hostname,
         requestCtr: reqcounter,
         count: req.params.count,
-        numbers: []
+        numbers: numbers
     });
 });
 
-router.get('/count/:count/:numberResponse', function(req, res) {
+router.get('/sortwrite/count/:count/:sendNumberResponse', function(req, res) {
     reqcounter++;
 
     let numbers = doSort(req.params.count);
     insertDocument(numbers);
-    if(req.params.numberResponse === 'false'){
+    if(req.params.sendNumberResponse === 'false'){
         numbers=[];
     }
     res.json({
@@ -146,7 +170,6 @@ function getDatabaseConnection(callback) {
     } else {
         callback(mongodbConn);
     }
-
 }
 
 function prepareSortDatabase() {
