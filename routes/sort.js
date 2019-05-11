@@ -13,6 +13,7 @@ let dbUrl = "mongodb://127.0.0.1:27017/sortdb";
 let mongodbConn=null;
 
 setHostname();
+//wait one second until mongoDB has started properly, before retrieving DB connection
 setTimeout(prepareSortDatabase,1000);
 
 router.get('/sortonly', function(req, res) {
@@ -20,19 +21,6 @@ router.get('/sortonly', function(req, res) {
 
     let numbers = doSort(1000);
     // console.log(numbers);
-    res.json({
-        hostname: hostname,
-        requestCtr: reqcounter,
-        numbers: numbers
-    });
-});
-
-router.get('/sortwrite', function(req, res) {
-    reqcounter++;
-
-    let numbers = doSort(1000);
-    // console.log(numbers);
-    insertDocument(numbers);
     res.json({
         hostname: hostname,
         requestCtr: reqcounter,
@@ -51,6 +39,20 @@ router.get('/sortonly/count/:count', function(req, res) {
         numbers: numbers
     });
 });
+
+router.get('/sortwrite', function(req, res) {
+    reqcounter++;
+
+    let numbers = doSort(1000);
+    // console.log(numbers);
+    insertDocument(numbers);
+    res.json({
+        hostname: hostname,
+        requestCtr: reqcounter,
+        numbers: numbers
+    });
+});
+
 
 router.get('/sortwrite/count/:count', function(req, res) {
     reqcounter++;
