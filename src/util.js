@@ -80,7 +80,7 @@ function populateDB() {
     );
 
     function insertNextUser() {
-        if (nextUserId < 100) {
+        if (nextUserId < 10) {
             let user = new User("User" + nextUserId, "user" + nextUserId + "@test.at", "user" + nextUserId);
             userCollection.insertOne({
                 _id: nextUserId + "",
@@ -101,7 +101,7 @@ function populateDB() {
     });
 
     function insertNextProduct() {
-        if (nextProductId < 100) {
+        if (nextProductId < 10) {
             productCollection.updateOne(
                 {_id: nextProductId},
                 {$set: {product: (new Product("Product" + nextProductId, "Product" + nextProductId, nextProductId, Math.floor((Math.random() * 10) + 1)))}},
