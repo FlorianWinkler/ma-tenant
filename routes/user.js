@@ -13,7 +13,7 @@ router.post('/register', function(req, res) {
     reqcounter++;
     let user = new User(
         req.body.username+nextUserId,
-        req.body.email+nextUserId,
+        req.body.email+nextUserId+"@test.at",
         req.body.password+nextUserId);
 
     findUserByUsername(user.username,function(dbResponse){
@@ -40,7 +40,11 @@ router.post('/login', function(req, res) {
     let password = req.body.password+random;
     findUserByUsername(username, function(dbResponse){
         if(dbResponse != null && checkUserCredentials(dbResponse.user,password)){
-            res.status(200).end();
+            // res.status(200).end();
+            res.status(200).json({
+                username: username,
+                password: password
+            });
         }
         else{
             console.log(dbResponse);
@@ -108,7 +112,7 @@ function checkUserCredentials(user, password){
 }
 
 function checkUserRequirements(user){
-    return user.password.length > 5 && user.email.includes("@") && user.email.includes(".");
+    return user.password.length > 4 && user.email.includes("@") && user.email.includes(".");
 }
 
 
