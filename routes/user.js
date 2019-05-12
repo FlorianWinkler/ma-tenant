@@ -6,7 +6,7 @@ const User = require('../src/User');
 const util = require('../src/util');
 
 let reqcounter = 0;
-let nextUserId = 0;
+let nextUserId = 1000;
 
 
 router.post('/register', function(req, res) {
@@ -65,7 +65,7 @@ function insertUser(user,callback){
                 if(err != null && err.code === 11000){
                     //conn.close();
                     //console.log(err);
-                    //console.log("Caught duplicate Key error while writing document! Retry...");
+                    console.log("Caught duplicate Key error while writing document! Retry...");
                     setTimeout(insertUser,100,user,callback);
                }
                 else {

@@ -1,6 +1,8 @@
 const exec = require('child_process').exec;
 const MongoClient = require("mongodb").MongoClient;
 const assert = require("assert");
+const User = require("../src/User");
+const Product = require("../src/Product");
 
 // const dbUrl = "mongodb://127.0.0.1:27017/monolithDB";
 const dbUrl = "mongodb://10.0.0.141:27017/monolithDB";
@@ -10,6 +12,7 @@ const productCollectionName="product";
 
 let hostname = "unknown_host";
 let mongodbConn=null;
+
 
 setHostname();
 //wait one second until mongoDB has started properly, before retrieving DB connection
@@ -40,6 +43,7 @@ function prepareDatabase() {
             connection.dropDatabase();
             console.log("Dropped DB");
             mongodbConn = connection;
+            setTimeout(populateDB,1000);
         }
     );
 }
@@ -61,6 +65,59 @@ function setHostname(){
 function getHostname(){
     return hostname;
 }
+
+function populateDB() {
+    let userCollection;
+    let nextUserId = 0;
+    let productCollection;
+    let nextProductId = 0;
+
+//--------insert Users--------
+    getDatabaseCollection(userCollectionName, function (collection) {
+            userCollection = collection;
+            insertNextUser();
+        }
+    );
+
+    function insertNextUser() {
+        if (nextUserId < 100) {
+            let user = new User("User" + nextUserId, "user" + nextUserId + "@test.at", "user" + nextUserId);
+            console.log("Insert User: "+user);
+            console.log()
+            userCollection.insertOne({
+                _id: nextUserId + "",
+                user: user
+            }, function (err, res) {
+                nextUserId++;
+                insertNextUser();
+            });
+        } else {
+            console.log("Users inserted");
+        }
+    }
+
+//--------insert Products--------
+    getDatabaseCollection(productCollectionName, function (collection) {
+        productCollection = collection;
+        insertNextProduct()
+    });
+
+    function insertNextProduct() {
+        if (nextProductId < 100) {
+            productCollection.updateOne(
+                {_id: nextProductId},
+                {$set: {product: (new Product("Product" + nextProductId, "Product" + nextProductId, nextProductId, Math.floor((Math.random() * 10) + 1)))}},
+                {upsert: true},
+                function (err, res) {
+                    nextProductId++;
+                    insertNextProduct();
+                });
+        } else {
+            console.log("Products inserted");
+        }
+    }
+}
+
 
 module.exports = {
     getDatabaseConnection: getDatabaseConnection,
