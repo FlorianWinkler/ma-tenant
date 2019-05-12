@@ -44,10 +44,22 @@ router.post('/login', function(req, res) {
     });
 });
 
+router.get('/get/:id', function(req, res) {
+    reqcounter++;
+    findUserById(req.params.id, function(dbResponse){
+        if(dbResponse != null ){
+            res.json(dbResponse);
+        }
+        else{
+            res.status(404).end();
+        }
+    });
+});
+
 function insertUser(user,callback){
     util.getDatabaseCollection(util.userCollectionName,function (collection) {
             collection.insertOne({
-                _id: nextUserId,
+                _id: nextUserId+"",
                 user: user
             }, function (err, res) {
                 if(err != null && err.code === 11000){
@@ -74,6 +86,14 @@ function findUserByUsername(username, callback) {
     util.getDatabaseCollection(util.userCollectionName,(async function (collection) {
         let retUser = await collection.findOne({"user.username": username});
         //console.log(retUser);
+        callback(retUser);
+    }));
+}
+
+function findUserById(id, callback) {
+    util.getDatabaseCollection(util.userCollectionName,(async function (collection) {
+        let retUser = await collection.findOne({"_id": id});
+        console.log(retUser);
         callback(retUser);
     }));
 }

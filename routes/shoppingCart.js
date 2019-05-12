@@ -10,8 +10,13 @@ let reqcounter = 0;
 
 router.post('/add/', function(req, res) {
     reqcounter++;
-    addProduct(req.body.userId, req.body.productId, req.body.qty, function (upsertedShoppingCart) {
-        res.json(upsertedShoppingCart);
+    addProduct(req.body.userId, req.body.productId, req.body.qty, function (upsertedShoppingCart,err) {
+        if(err !== true) {
+            res.json(upsertedShoppingCart);
+        }
+        else{
+            res.status(400).end();
+        }
     });
 });
 
@@ -39,33 +44,64 @@ router.get('/get/:userId', function(req, res) {
 //     });
 // });
 
-function addProduct(userId, productId, qty, callback){
-    util.getDatabaseCollection(util.shoppingCartCollectionName,function (collection) {
-            let sci = new ShoppingCartItem(productId,qty);
-            collection.updateOne(
-                {"shoppingCart.userId": userId},
-                {
-                    $set: {"shoppingCart.userId": userId},
-                    $addToSet: {"shoppingCart.items": sci}
-                },
-                {upsert: true},
-                function (err, res) {
-                if(err != null && err.code === 11000){
-                    //conn.close();
-                    //console.log(err);
-                    console.log("Caught duplicate Key error while writing document! Retry...");
-                    setTimeout(addProduct,100,userId, productId, qty, callback);
-               }
-                else {
-                    assert.equal(err, null);
-                    // nextProductId++;
-                    callback({
-                       userId: userId,
-                       addedItem: sci
+function addProduct(userId, productId, qty, callback) {
+
+    let validUser=false;
+    let validProduct=false;
+
+    util.getDatabaseCollection(util.userCollectionName, async function (collection) {
+
+        //first check if the User ID is of a valid User
+        let user = await collection.findOne({"_id": userId});
+        console.log("ID: "+userId);
+        console.log("User: "+user);
+        if (user != null) {
+            validUser = true;
+            console.log("Valid User:" + user);
+
+            //Check if the Product ID is from a valid Product
+            util.getDatabaseCollection(util.productCollectionName, async function (collection) {
+                let product = await collection.findOne({_id: productId});
+                if (product != null) {
+                    validProduct = true;
+                    console.log("Valid Product" + product);
+
+                    //if User ID and Product ID are valid, insert the product to the shopping-cart
+                    util.getDatabaseCollection(util.shoppingCartCollectionName, function (collection) {
+                        let sci = new ShoppingCartItem(productId, qty);
+                        collection.updateOne(
+                            {"shoppingCart.userId": userId},
+                            {
+                                $set: {"shoppingCart.userId": userId},
+                                $addToSet: {"shoppingCart.items": sci}
+                            },
+                            {upsert: true},
+                            function (err, res) {
+                                if (err != null && err.code === 11000) {
+                                    //conn.close();
+                                    //console.log(err);
+                                    console.log("Caught duplicate Key error while writing document! Retry...");
+                                    setTimeout(addProduct, 100, userId, productId, qty, callback);
+                                } else {
+                                    assert.equal(err, null);
+                                    // nextProductId++;
+                                    callback({
+                                        userId: userId,
+                                        addedItem: sci
+                                    });
+                                }
+                            });
                     });
-               }
+                }
+                else{
+                    callback(null,true);
+                }
             });
-        });
+        }
+        else{
+            callback(null,true);
+        }
+    });
 }
 
 function getShoppingCartByUserId(userId, callback) {
