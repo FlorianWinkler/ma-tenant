@@ -11,10 +11,12 @@ let nextUserId = 1000;
 
 router.post('/register', function(req, res) {
     reqcounter++;
-    let user = new User(req.body.username,req.body.email,req.body.password);
+    let user = new User(
+        req.body.username+nextUserId,
+        req.body.email+nextUserId,
+        req.body.password+nextUserId);
 
     findUserByUsername(user.username,function(dbResponse){
-
         if(dbResponse == null){
             if(checkUserRequirements(user)){
                 insertUser(user,function(insertedUser){
@@ -33,8 +35,11 @@ router.post('/register', function(req, res) {
 
 router.post('/login', function(req, res) {
     reqcounter++;
-    findUserByUsername(req.body.username, function(dbResponse){
-        if(dbResponse != null && checkUserCredentials(dbResponse.user,req.body.username,req.body.password)){
+    let random = Math.floor((Math.random() * 100));
+    let username = req.body.username+random;
+    let password = req.body.password+random;
+    findUserByUsername(username, function(dbResponse){
+        if(dbResponse != null && checkUserCredentials(dbResponse.user,password)){
             res.status(200).end();
         }
         else{
@@ -98,8 +103,8 @@ function findUserById(id, callback) {
     }));
 }
 
-function checkUserCredentials(user, username, password){
-    return user.username === username && user.password === password;
+function checkUserCredentials(user, password){
+    return user.password === password;
 }
 
 function checkUserRequirements(user){
