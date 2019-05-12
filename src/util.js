@@ -3,9 +3,13 @@ const MongoClient = require("mongodb").MongoClient;
 const assert = require("assert");
 
 // const dbUrl = "mongodb://127.0.0.1:27017/monolithDB";
-const dbUrl = "mongodb://10.0.0.141:27017/user";
+const dbUrl = "mongodb://10.0.0.141:27017/monolithDB";
 let hostname = "unknown_host";
 let mongodbConn=null;
+
+setHostname();
+//wait one second until mongoDB has started properly, before retrieving DB connection
+setTimeout(prepareDatabase,1000);
 
 function getDatabaseConnection(callback) {
     if (mongodbConn == null) {

@@ -11,12 +11,6 @@ let reqcounter = 0;
 let nextUserId = 0;
 
 
-
-util.setHostname();
-//wait one second until mongoDB has started properly, before retrieving DB connection
-setTimeout(util.prepareDatabase,1000);
-
-
 router.post('/register', function(req, res) {
     reqcounter++;
     let user = new User(req.body.username,req.body.email,req.body.password);
@@ -46,7 +40,8 @@ router.post('/login', function(req, res) {
             res.status(200).end();
         }
         else{
-            res.status(403).end();
+            console.log(dbResponse);
+            res.status(401).end();
         }
     });
 });

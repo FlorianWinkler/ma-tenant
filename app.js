@@ -7,6 +7,7 @@ const app = express();
 const index = require('./routes/index');
 // const sort = require('./routes/sort');
 const user = require('./routes/user');
+const product = require('./routes/product');
 
 // Generic application setup
 app.use(logger('dev'));
@@ -18,6 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 // app.use('/sort', sort);
 app.use('/user', user);
+app.use('/product', product);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
