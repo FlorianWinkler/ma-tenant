@@ -8,6 +8,7 @@ const index = require('./routes/index');
 // const sort = require('./routes/sort');
 const user = require('./routes/user');
 const product = require('./routes/product');
+const cart = require('./routes/shoppingCart');
 
 // Generic application setup
 app.use(logger('dev'));
@@ -20,6 +21,7 @@ app.use('/', index);
 // app.use('/sort', sort);
 app.use('/user', user);
 app.use('/product', product);
+app.use('/cart', cart);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

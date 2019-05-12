@@ -5,8 +5,6 @@ const assert = require("assert");
 const Product = require('../src/Product');
 const util = require('../src/util');
 
-const collectionName="product";
-
 let reqcounter = 0;
 let nextProductId = 0;
 
@@ -20,7 +18,7 @@ router.post('/edit/:id', function(req, res) {
     });
 });
 
-router.post('/get/:id', function(req, res) {
+router.get('/get/:id', function(req, res) {
     reqcounter++;
     findProductById(req.params.id, function(dbResponse){
         if(dbResponse != null ){
@@ -33,7 +31,7 @@ router.post('/get/:id', function(req, res) {
 });
 
 function upsertProduct(id, product, callback){
-    util.getDatabaseCollection(collectionName,function (collection) {
+    util.getDatabaseCollection(util.productCollectionName,function (collection) {
             collection.updateOne(
                 {_id: id},
                 {$set: {product: product}},
@@ -43,7 +41,7 @@ function upsertProduct(id, product, callback){
                     //conn.close();
                     //console.log(err);
                     //console.log("Caught duplicate Key error while writing document! Retry...");
-                    setTimeout(upsertProduct,100,product);
+                    setTimeout(upsertProduct,100, id, product, callback);
                }
                 else {
                     assert.equal(err, null);
@@ -58,7 +56,7 @@ function upsertProduct(id, product, callback){
 }
 
 function findProductById(id, callback) {
-    util.getDatabaseCollection(collectionName,(async function (collection) {
+    util.getDatabaseCollection(util.productCollectionName,(async function (collection) {
         let retProduct = await collection.findOne({"_id": id});
         //console.log(retUser);
         callback(retProduct);

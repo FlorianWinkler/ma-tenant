@@ -4,6 +4,10 @@ const assert = require("assert");
 
 // const dbUrl = "mongodb://127.0.0.1:27017/monolithDB";
 const dbUrl = "mongodb://10.0.0.141:27017/monolithDB";
+const shoppingCartCollectionName="shoppingCart";
+const userCollectionName="user";
+const productCollectionName="product";
+
 let hostname = "unknown_host";
 let mongodbConn=null;
 
@@ -63,5 +67,8 @@ module.exports = {
     getDatabaseCollection: getDatabaseCollection,
     prepareDatabase: prepareDatabase,
     setHostname: setHostname,
-    getHostname: getHostname
+    getHostname: getHostname,
+    shoppingCartCollectionName: shoppingCartCollectionName,
+    userCollectionName: userCollectionName,
+    productCollectionName: productCollectionName
 };

@@ -5,8 +5,6 @@ const assert = require("assert");
 const User = require('../src/User');
 const util = require('../src/util');
 
-const collectionName="user";
-
 let reqcounter = 0;
 let nextUserId = 0;
 
@@ -47,7 +45,7 @@ router.post('/login', function(req, res) {
 });
 
 function insertUser(user,callback){
-    util.getDatabaseCollection(collectionName,function (collection) {
+    util.getDatabaseCollection(util.userCollectionName,function (collection) {
             collection.insertOne({
                 _id: nextUserId,
                 user: user
@@ -56,7 +54,7 @@ function insertUser(user,callback){
                     //conn.close();
                     //console.log(err);
                     //console.log("Caught duplicate Key error while writing document! Retry...");
-                    setTimeout(insertUser,100,user);
+                    setTimeout(insertUser,100,user,callback);
                }
                 else {
                     assert.equal(err, null);
@@ -73,7 +71,7 @@ function insertUser(user,callback){
 
 
 function findUserByUsername(username, callback) {
-    util.getDatabaseCollection(collectionName,(async function (collection) {
+    util.getDatabaseCollection(util.userCollectionName,(async function (collection) {
         let retUser = await collection.findOne({"user.username": username});
         //console.log(retUser);
         callback(retUser);
