@@ -43,7 +43,7 @@ function prepareDatabase() {
             connection.dropDatabase();
             console.log("Dropped DB");
             mongodbConn = connection;
-            setTimeout(populateDB,1000);
+            populateDB();
         }
     );
 }
@@ -82,8 +82,6 @@ function populateDB() {
     function insertNextUser() {
         if (nextUserId < 100) {
             let user = new User("User" + nextUserId, "user" + nextUserId + "@test.at", "user" + nextUserId);
-            console.log("Insert User: "+user);
-            console.log()
             userCollection.insertOne({
                 _id: nextUserId + "",
                 user: user
