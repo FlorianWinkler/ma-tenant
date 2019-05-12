@@ -17,18 +17,39 @@ util.setHostname();
 setTimeout(util.prepareDatabase,1000);
 
 
-router.post('/register', async function(req, res) {
+router.post('/register', function(req, res) {
     reqcounter++;
-
     let user = new User(req.body.username,req.body.email,req.body.password);
 
-    insertUser(user,function(insertedUser){
-        res.json(insertedUser);
+    findUserByUsername(user.username,function(dbResponse){
+
+        if(dbResponse == null){
+            if(checkUserRequirements(user)){
+                insertUser(user,function(insertedUser){
+                    res.json(insertedUser);
+                });
+            }
+            else{
+                res.status(412).end();
+            }
+        }
+        else{
+            res.status(418).end();
+        }
     });
-    // res.status(200).end();
 });
 
-
+router.post('/login', function(req, res) {
+    reqcounter++;
+    findUserByUsername(req.body.username, function(dbResponse){
+        if(dbResponse != null && checkUserCredentials(dbResponse.user,req.body.username,req.body.password)){
+            res.status(200).end();
+        }
+        else{
+            res.status(403).end();
+        }
+    });
+});
 
 function insertUser(user,callback){
     util.getDatabaseCollection(collectionName,function (collection) {
@@ -55,17 +76,22 @@ function insertUser(user,callback){
         });
 }
 
-function findAllDocuments(callback) {
-    util.getDatabaseCollection(collectionName,(function (collection) {
-        collection.find({}).toArray(function (err, docs) {
-            assert.equal(err, null);
-            // console.log("Found the following records");
-            // console.log(docs);
-            callback(docs);
-        });
+
+function findUserByUsername(username, callback) {
+    util.getDatabaseCollection(collectionName,(async function (collection) {
+        let retUser = await collection.findOne({"user.username": username});
+        //console.log(retUser);
+        callback(retUser);
     }));
 }
 
+function checkUserCredentials(user, username, password){
+    return user.username === username && user.password === password;
+}
+
+function checkUserRequirements(user){
+    return user.password.length > 5 && user.email.includes("@") && user.email.includes(".");
+}
 
 
 module.exports = router;
