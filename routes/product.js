@@ -13,7 +13,7 @@ let nextProductId = 0;
 router.post('/edit/:id', function(req, res) {
     reqcounter++;
 
-    let product = new Product(req.body.name,req.body.description,req.body.type);
+    let product = new Product(req.body.name,req.body.description, req.body.price,req.body.type);
 
     upsertProduct(req.params.id, product, function (upsertedProduct) {
         res.json(upsertedProduct);
