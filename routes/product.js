@@ -30,7 +30,7 @@ router.get('/get/:id', function(req, res) {
     });
 });
 
-router.get('/search/', function(req, res) {
+router.get('/search', function(req, res) {
     reqcounter++;
     let searchStr = Math.floor((Math.random() * 10)+10);
     // console.log(searchStr);
