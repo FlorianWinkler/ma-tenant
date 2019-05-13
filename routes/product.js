@@ -30,6 +30,20 @@ router.get('/get/:id', function(req, res) {
     });
 });
 
+router.get('/search/', function(req, res) {
+    reqcounter++;
+    let searchStr = Math.floor((Math.random() * 10)+10);
+    console.log(searchStr);
+    searchProducts(searchStr.toString(), function(dbResponse){
+        if(dbResponse != null ){
+            res.json(dbResponse);
+        }
+        else{
+            res.status(404).end();
+        }
+    });
+});
+
 function upsertProduct(id, product, callback){
     util.getDatabaseCollection(util.productCollectionName,function (collection) {
             collection.updateOne(
@@ -60,6 +74,14 @@ function findProductById(id, callback) {
         let retProduct = await collection.findOne({"_id": id});
         //console.log(retUser);
         callback(retProduct);
+    }));
+}
+
+function searchProducts(searchStr, callback){
+    util.getDatabaseCollection(util.productCollectionName,(async function (collection) {
+        let retProducts = await collection.find({"product.name": {$regex : searchStr}}).toArray();
+        //console.log(retUser);
+        callback(retProducts);
     }));
 }
 

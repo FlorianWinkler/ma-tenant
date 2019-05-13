@@ -5,7 +5,7 @@ const User = require("../src/User");
 const Product = require("../src/Product");
 
 // const dbUrl = "mongodb://127.0.0.1:27017/monolithDB";
-const dbUrl = "mongodb://10.0.0.141:27017/monolithDB";
+const dbUrl = "mongodb://10.0.0.149:27017/monolithDB";
 const shoppingCartCollectionName="shoppingCart";
 const userCollectionName="user";
 const productCollectionName="product";
