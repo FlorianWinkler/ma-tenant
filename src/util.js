@@ -3,6 +3,8 @@ const MongoClient = require("mongodb").MongoClient;
 const assert = require("assert");
 const User = require("../src/User");
 const Product = require("../src/Product");
+const ShoppingCart = require("../src/ShoppingCart");
+const ShoppingCartItem = require("../src/ShoppingCartItem");
 
 // const dbUrl = "mongodb://127.0.0.1:27017/monolithDB";
 const dbUrl = "mongodb://10.0.0.149:27017/monolithDB";
@@ -71,6 +73,8 @@ function populateDB() {
     let nextUserId = 0;
     let productCollection;
     let nextProductId = 0;
+    let cartCollection;
+    let nextCartUserId=0;
 
 //--------insert Users--------
     getDatabaseCollection(userCollectionName, function (collection) {
@@ -83,7 +87,7 @@ function populateDB() {
         if (nextUserId < 100) {
             let user = new User("User" + nextUserId, "user" + nextUserId + "@test.at", "user" + nextUserId);
             userCollection.insertOne({
-                _id: nextUserId + "",
+                _id: nextUserId.toString(),
                 user: user
             }, function (err, res) {
                 nextUserId++;
@@ -103,7 +107,7 @@ function populateDB() {
     function insertNextProduct() {
         if (nextProductId < 100) {
             productCollection.updateOne(
-                {_id: nextProductId},
+                {_id: nextProductId.toString()},
                 {$set: {product: (new Product("Product" + nextProductId, "Product" + nextProductId, nextProductId, Math.floor((Math.random() * 10) + 1)))}},
                 {upsert: true},
                 function (err, res) {
@@ -112,6 +116,29 @@ function populateDB() {
                 });
         } else {
             console.log("Products inserted");
+        }
+    }
+
+//--------insert Products--------
+    getDatabaseCollection(shoppingCartCollectionName, function (collection) {
+        cartCollection = collection;
+        insertNextShoppingCart()
+    });
+
+    function insertNextShoppingCart(){
+        if(nextCartUserId < 100){
+            let randomProduct = Math.floor((Math.random() * 99)).toString();
+            let randomQty = Math.floor((Math.random() * 10));
+            let cartItem = new ShoppingCartItem(randomProduct,randomQty);
+            let cart = new ShoppingCart(nextCartUserId.toString(),[cartItem]);
+            cartCollection.insertOne({
+                shoppingCart: cart
+            }, function (err, res) {
+                nextCartUserId++;
+                insertNextShoppingCart();
+            });
+        }else{
+            console.log("Shopping Carts inserted");
         }
     }
 }

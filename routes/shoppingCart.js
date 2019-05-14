@@ -8,9 +8,13 @@ const util = require('../src/util');
 
 let reqcounter = 0;
 
-router.post('/add/', function(req, res) {
+router.post('/add', function(req, res) {
     reqcounter++;
-    addProduct(req.body.userId, req.body.productId, req.body.qty, function (upsertedShoppingCart,err) {
+    let randomUser = Math.floor((Math.random() * 100)).toString();
+    let randomProduct = Math.floor((Math.random() * 100)).toString();
+    let randomQty = Math.floor((Math.random() * 5));
+
+    addProduct(randomUser, randomProduct, randomQty, function (upsertedShoppingCart,err) {
         if(err !== true) {
             res.json(upsertedShoppingCart);
         }
@@ -20,9 +24,10 @@ router.post('/add/', function(req, res) {
     });
 });
 
-router.get('/get/:userId', function(req, res) {
+router.get('/get', function(req, res) {
     reqcounter++;
-    getShoppingCartByUserId(req.params.userId, function(dbResponse){
+    let random = Math.floor((Math.random() * 100)).toString();
+    getShoppingCartByUserId(random, function(dbResponse){
         if(dbResponse != null ){
             res.json(dbResponse.shoppingCart);
         }

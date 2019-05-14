@@ -8,33 +8,41 @@ const util = require('../src/util');
 let reqcounter = 0;
 let nextProductId = 0;
 
-router.post('/edit/:id', function(req, res) {
+router.post('/edit', function(req, res) {
     reqcounter++;
 
-    let product = new Product(req.body.name,req.body.description, req.body.price,req.body.type);
+    let randomId = Math.floor((Math.random() * 100)).toString();
+    let randomType = Math.floor((Math.random() * 10)).toString();
+    let product = new Product(
+        req.body.name+randomId,
+        req.body.description+randomId,
+        randomId,
+        randomType);
 
-    upsertProduct(req.params.id, product, function (upsertedProduct) {
+    upsertProduct(randomId, product, function (upsertedProduct) {
         res.json(upsertedProduct);
     });
 });
 
-router.get('/get/:id', function(req, res) {
+router.get('/get', function(req, res) {
     reqcounter++;
-    findProductById(req.params.id, function(dbResponse){
+    let random = Math.floor((Math.random() * 100)).toString();
+
+    findProductById(random, function(dbResponse){
         if(dbResponse != null ){
             res.json(dbResponse);
         }
         else{
-            res.status(404).end();
+            res.status(400).end();
         }
     });
 });
 
 router.get('/search', function(req, res) {
     reqcounter++;
-    let searchStr = Math.floor((Math.random() * 10)+10);
+    let searchStr = Math.floor((Math.random() * 10)+10).toString();
     // console.log(searchStr);
-    searchProducts(searchStr.toString(), function(dbResponse){
+    searchProducts(searchStr, function(dbResponse){
         if(dbResponse != null ){
             res.json(dbResponse);
         }
@@ -71,8 +79,9 @@ function upsertProduct(id, product, callback){
 
 function findProductById(id, callback) {
     util.getDatabaseCollection(util.productCollectionName,(async function (collection) {
+        console.log(id);
         let retProduct = await collection.findOne({"_id": id});
-        //console.log(retUser);
+        console.log(retProduct);
         callback(retProduct);
     }));
 }

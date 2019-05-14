@@ -47,20 +47,21 @@ router.post('/login', function(req, res) {
             });
         }
         else{
-            console.log(dbResponse);
+            // console.log(dbResponse);
             res.status(401).end();
         }
     });
 });
 
-router.get('/get/:id', function(req, res) {
+router.get('/get', function(req, res) {
     reqcounter++;
-    findUserById(req.params.id, function(dbResponse){
+    let random = Math.floor((Math.random() * 99)).toString();
+    findUserById(random, function(dbResponse){
         if(dbResponse != null ){
             res.json(dbResponse);
         }
         else{
-            res.status(404).end();
+            res.status(400).end();
         }
     });
 });
@@ -101,8 +102,8 @@ function findUserByUsername(username, callback) {
 
 function findUserById(id, callback) {
     util.getDatabaseCollection(util.userCollectionName,(async function (collection) {
-        let retUser = await collection.findOne({"_id": id});
-        console.log(retUser);
+        let retUser = await collection.findOne({"_id": id.toString()});
+        // console.log(retUser);
         callback(retUser);
     }));
 }
