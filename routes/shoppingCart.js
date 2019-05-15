@@ -58,18 +58,18 @@ function addProduct(userId, productId, qty, callback) {
 
         //first check if the User ID is of a valid User
         let user = await collection.findOne({"_id": userId});
-        console.log("ID: "+userId);
-        console.log("User: "+user);
+        // console.log("ID: "+userId);
+        // console.log("User: "+user);
         if (user != null) {
             validUser = true;
-            console.log("Valid User:" + user);
+            // console.log("Valid User:" + user);
 
             //Check if the Product ID is from a valid Product
             util.getDatabaseCollection(util.productCollectionName, async function (collection) {
                 let product = await collection.findOne({_id: productId});
                 if (product != null) {
                     validProduct = true;
-                    console.log("Valid Product" + product);
+                    // console.log("Valid Product" + product);
 
                     //if User ID and Product ID are valid, insert the product to the shopping-cart
                     util.getDatabaseCollection(util.shoppingCartCollectionName, function (collection) {

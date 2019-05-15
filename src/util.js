@@ -119,7 +119,7 @@ function populateDB() {
         }
     }
 
-//--------insert Products--------
+//--------insert Shopping Carts--------
     getDatabaseCollection(shoppingCartCollectionName, function (collection) {
         cartCollection = collection;
         insertNextShoppingCart()

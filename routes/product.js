@@ -79,9 +79,9 @@ function upsertProduct(id, product, callback){
 
 function findProductById(id, callback) {
     util.getDatabaseCollection(util.productCollectionName,(async function (collection) {
-        console.log(id);
+        // console.log(id);
         let retProduct = await collection.findOne({"_id": id});
-        console.log(retProduct);
+        // console.log(retProduct);
         callback(retProduct);
     }));
 }
