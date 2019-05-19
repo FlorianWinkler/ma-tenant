@@ -6,7 +6,7 @@ const User = require('../src/User');
 const util = require('../src/util');
 
 let reqcounter = 0;
-let nextUserId = 1000;
+let nextUserId = util.numPopulateItems+1000;
 
 
 router.post('/register', function(req, res) {
@@ -35,7 +35,7 @@ router.post('/register', function(req, res) {
 
 router.post('/login', function(req, res) {
     reqcounter++;
-    let random = Math.floor((Math.random() * 100));
+    let random = Math.floor((Math.random() * util.numPopulateItems-1));
     let username = req.body.username+random;
     let password = req.body.password+random;
     findUserByUsername(username, function(dbResponse){
@@ -55,7 +55,7 @@ router.post('/login', function(req, res) {
 
 router.get('/get', function(req, res) {
     reqcounter++;
-    let random = Math.floor((Math.random() * 99)).toString();
+    let random = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
     findUserById(random, function(dbResponse){
         if(dbResponse != null ){
             res.json(dbResponse);

@@ -11,7 +11,7 @@ let nextProductId = 0;
 router.post('/edit', function(req, res) {
     reqcounter++;
 
-    let randomId = Math.floor((Math.random() * 100)).toString();
+    let randomId = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
     let randomType = Math.floor((Math.random() * 10)).toString();
     let product = new Product(
         req.body.name+randomId,
@@ -26,7 +26,7 @@ router.post('/edit', function(req, res) {
 
 router.get('/get', function(req, res) {
     reqcounter++;
-    let random = Math.floor((Math.random() * 100)).toString();
+    let random = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
 
     findProductById(random, function(dbResponse){
         if(dbResponse != null ){

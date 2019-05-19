@@ -6,11 +6,13 @@ const Product = require("../src/Product");
 const ShoppingCart = require("../src/ShoppingCart");
 const ShoppingCartItem = require("../src/ShoppingCartItem");
 
-// const dbUrl = "mongodb://127.0.0.1:27017/monolithDB";
-const dbUrl = "mongodb://10.0.0.149:27017/monolithDB";
+const dbUrl = "mongodb://127.0.0.1:27017/monolithDB";
+// const dbUrl = "mongodb://10.0.0.166:27017/monolithDB";
 const shoppingCartCollectionName="shoppingCart";
 const userCollectionName="user";
 const productCollectionName="product";
+
+const numPopulateItems = 1000;
 
 let hostname = "unknown_host";
 let mongodbConn=null;
@@ -84,7 +86,7 @@ function populateDB() {
     );
 
     function insertNextUser() {
-        if (nextUserId < 100) {
+        if (nextUserId < numPopulateItems) {
             let user = new User("User" + nextUserId, "user" + nextUserId + "@test.at", "user" + nextUserId);
             userCollection.insertOne({
                 _id: nextUserId.toString(),
@@ -105,7 +107,7 @@ function populateDB() {
     });
 
     function insertNextProduct() {
-        if (nextProductId < 100) {
+        if (nextProductId < numPopulateItems) {
             productCollection.updateOne(
                 {_id: nextProductId.toString()},
                 {$set: {product: (new Product("Product" + nextProductId, "Product" + nextProductId, nextProductId, Math.floor((Math.random() * 10) + 1)))}},
@@ -126,8 +128,8 @@ function populateDB() {
     });
 
     function insertNextShoppingCart(){
-        if(nextCartUserId < 100){
-            let randomProduct = Math.floor((Math.random() * 99)).toString();
+        if(nextCartUserId < numPopulateItems){
+            let randomProduct = Math.floor((Math.random() * numPopulateItems-1)).toString();
             let randomQty = Math.floor((Math.random() * 10));
             let cartItem = new ShoppingCartItem(randomProduct,randomQty);
             let cart = new ShoppingCart(nextCartUserId.toString(),[cartItem]);
@@ -152,5 +154,6 @@ module.exports = {
     getHostname: getHostname,
     shoppingCartCollectionName: shoppingCartCollectionName,
     userCollectionName: userCollectionName,
-    productCollectionName: productCollectionName
+    productCollectionName: productCollectionName,
+    numPopulateItems: numPopulateItems
 };
