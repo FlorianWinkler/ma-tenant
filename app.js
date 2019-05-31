@@ -8,7 +8,7 @@ const index = require('./routes/index');
 // const sort = require('./routes/sort');
 const user = require('./routes/user');
 const product = require('./routes/product');
-const cart = require('./routes/shoppingCart');
+const cart = require('./routes/cart');
 
 // Generic application setup
 app.use(logger('dev'));

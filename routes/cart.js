@@ -2,8 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const assert = require("assert");
-const ShoppingCart = require('../src/ShoppingCart');
-const ShoppingCartItem = require("../src/ShoppingCartItem");
+const Cart = require('../src/Cart');
+const cartItem = require("../src/CartItem");
 const util = require('../src/util');
 
 let reqcounter = 0;
@@ -14,9 +14,9 @@ router.post('/add', function(req, res) {
     let randomProduct = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
     let randomQty = Math.floor((Math.random() * 5));
 
-    addProduct(randomUser, randomProduct, randomQty, function (upsertedShoppingCart,err) {
+    addProduct(randomUser, randomProduct, randomQty, function (upsertedCart,err) {
         if(err !== true) {
-            res.json(upsertedShoppingCart);
+            res.json(upsertedCart);
         }
         else{
             res.status(400).end();
@@ -27,9 +27,9 @@ router.post('/add', function(req, res) {
 router.get('/get', function(req, res) {
     reqcounter++;
     let random = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
-    getShoppingCartByUserId(random, function(dbResponse){
+    getCartByUserId(random, function(dbResponse){
         if(dbResponse != null ){
-            res.json(dbResponse.shoppingCart);
+            res.json(dbResponse.cart);
         }
         else{
             res.status(400).end();
@@ -39,7 +39,7 @@ router.get('/get', function(req, res) {
 
 // router.get('/get', function(req, res) {
 //     reqcounter++;
-//     getAllShoppingCarts(function(dbResponse){
+//     getAllCarts(function(dbResponse){
 //         if(dbResponse != null ){
 //             res.json(dbResponse);
 //         }
@@ -72,13 +72,13 @@ function addProduct(userId, productId, qty, callback) {
                     // console.log("Valid Product" + product);
 
                     //if User ID and Product ID are valid, insert the product to the shopping-cart
-                    util.getDatabaseCollection(util.shoppingCartCollectionName, function (collection) {
-                        let sci = new ShoppingCartItem(productId, qty);
+                    util.getDatabaseCollection(util.cartCollectionName, function (collection) {
+                        let sci = new cartItem(productId, qty);
                         collection.updateOne(
-                            {"shoppingCart.userId": userId},
+                            {"cart.userId": userId},
                             {
-                                $set: {"shoppingCart.userId": userId},
-                                $addToSet: {"shoppingCart.items": sci}
+                                $set: {"cart.userId": userId},
+                                $addToSet: {"cart.items": sci}
                             },
                             {upsert: true},
                             function (err, res) {
@@ -109,16 +109,16 @@ function addProduct(userId, productId, qty, callback) {
     });
 }
 
-function getShoppingCartByUserId(userId, callback) {
-    util.getDatabaseCollection(util.shoppingCartCollectionName,(async function (collection) {
-        let retShoppingCart = await collection.findOne({"shoppingCart.userId": userId});
+function getCartByUserId(userId, callback) {
+    util.getDatabaseCollection(util.cartCollectionName,(async function (collection) {
+        let retCart = await collection.findOne({"cart.userId": userId});
         //console.log(retUser);
-        callback(retShoppingCart);
+        callback(retCart);
     }));
 }
 
-// function getAllShoppingCarts(callback) {
-//     util.getDatabaseCollection(util.shoppingCartCollectionName,(async function (collection) {
+// function getAllCarts(callback) {
+//     util.getDatabaseCollection(util.cartCollectionName,(async function (collection) {
 //         collection.find({}).toArray(function (err, docs) {
 //             assert.equal(err, null);
 //             // console.log("Found the following records");

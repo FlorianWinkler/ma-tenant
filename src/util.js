@@ -3,12 +3,12 @@ const MongoClient = require("mongodb").MongoClient;
 const assert = require("assert");
 const User = require("../src/User");
 const Product = require("../src/Product");
-const ShoppingCart = require("../src/ShoppingCart");
-const ShoppingCartItem = require("../src/ShoppingCartItem");
+const Cart = require("./Cart");
+const CartItem = require("./CartItem");
 
-const dbUrl = "mongodb://127.0.0.1:27017/monolithDB";
-// const dbUrl = "mongodb://10.0.0.166:27017/monolithDB";
-const shoppingCartCollectionName="shoppingCart";
+const dbUrl = "mongodb://127.0.0.1:27017/monolithdb";
+// const dbUrl = "mongodb://10.0.0.206:27017/monolithdb";
+const cartCollectionName="cart";
 const userCollectionName="user";
 const productCollectionName="product";
 
@@ -20,7 +20,7 @@ let mongodbConn=null;
 
 setHostname();
 //wait one second until mongoDB has started properly, before retrieving DB connection
-setTimeout(prepareDatabase,1000);
+// setTimeout(prepareDatabase,1000);
 
 function getDatabaseConnection(callback) {
     if (mongodbConn == null) {
@@ -122,22 +122,22 @@ function populateDB() {
     }
 
 //--------insert Shopping Carts--------
-    getDatabaseCollection(shoppingCartCollectionName, function (collection) {
+    getDatabaseCollection(cartCollectionName, function (collection) {
         cartCollection = collection;
-        insertNextShoppingCart()
+        insertNextCart()
     });
 
-    function insertNextShoppingCart(){
+    function insertNextCart(){
         if(nextCartUserId < numPopulateItems){
             let randomProduct = Math.floor((Math.random() * numPopulateItems-1)).toString();
             let randomQty = Math.floor((Math.random() * 10));
-            let cartItem = new ShoppingCartItem(randomProduct,randomQty);
-            let cart = new ShoppingCart(nextCartUserId.toString(),[cartItem]);
+            let cartItem = new CartItem(randomProduct,randomQty);
+            let cart = new Cart(nextCartUserId.toString(),[cartItem]);
             cartCollection.insertOne({
-                shoppingCart: cart
+                cart: cart
             }, function (err, res) {
                 nextCartUserId++;
-                insertNextShoppingCart();
+                insertNextCart();
             });
         }else{
             console.log("Shopping Carts inserted");
@@ -152,7 +152,7 @@ module.exports = {
     prepareDatabase: prepareDatabase,
     setHostname: setHostname,
     getHostname: getHostname,
-    shoppingCartCollectionName: shoppingCartCollectionName,
+    cartCollectionName: cartCollectionName,
     userCollectionName: userCollectionName,
     productCollectionName: productCollectionName,
     numPopulateItems: numPopulateItems
