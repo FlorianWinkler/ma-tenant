@@ -47,7 +47,7 @@ router.get('/search', function(req, res) {
             res.json(dbResponse);
         }
         else{
-            res.status(404).end();
+            res.status(400).end();
         }
     });
 });
