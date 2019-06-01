@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const index = require('./routes/index');
-// const sort = require('./routes/sort');
 const user = require('./routes/user');
 const product = require('./routes/product');
 const cart = require('./routes/cart');
@@ -18,7 +17,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/', index);
-// app.use('/sort', sort);
 app.use('/user', user);
 app.use('/product', product);
 app.use('/cart', cart);

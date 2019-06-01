@@ -20,7 +20,12 @@ router.post('/register', function(req, res) {
         if(dbResponse == null){
             if(checkUserRequirements(user)){
                 insertUser(user,function(insertedUser){
-                    res.json(insertedUser);
+                    if(insertedUser.code!==11000){
+                        res.json(insertedUser);
+                    }
+                    else{
+                        res.status(409).end();
+                    }
                 });
             }
             else{
@@ -28,6 +33,7 @@ router.post('/register', function(req, res) {
             }
         }
         else{
+            nextUserId++;
             res.status(418).end();
         }
     });
@@ -75,8 +81,19 @@ function insertUser(user,callback){
                 if(err != null && err.code === 11000){
                     //conn.close();
                     //console.log(err);
-                    console.log("Caught duplicate Key error while writing document! Retry...");
-                    setTimeout(insertUser,100,user,callback);
+                    // insertErrCtr++;
+                    // if(insertErrCtr<1) {
+                    //     console.log("Caught duplicate Key error while writing document! Retry...");
+                    //     // setTimeout(insertUser, 100, user, callback);
+                    //     nextUserId++;
+                    //     insertUser(user,callback);
+                    // }
+                    // else{
+                    //     insertErrCtr=0;
+                    //     callback(err);
+                    // }
+                    nextUserId++;
+                    callback(err);
                }
                 else {
                     assert.equal(err, null);
