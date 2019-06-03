@@ -11,4 +11,11 @@ router.get('/preparedb', function(req, res, next) {
   res.send('Populating monolithic DB...');
 });
 
+router.get('/getconfig', function(req, res, next) {
+    res.json({
+        hostname: util.getHostname(),
+        numPopulateItems: util.numPopulateItems
+    });
+});
+
 module.exports = router;
