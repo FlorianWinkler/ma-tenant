@@ -1,5 +1,5 @@
 {
-  "name": "ba-monolith",
+  "name": "ma-tenant",
   "version": "0.0.0",
   "private": true,
   "scripts": {

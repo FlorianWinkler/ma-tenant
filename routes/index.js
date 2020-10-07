@@ -3,12 +3,12 @@ const router = express.Router();
 const util = require('../src/util');
 
 router.get('/', function(req, res, next) {
-  res.send('Monolith Service running!');
+  res.send('Tenant Service running!');
 });
 
 router.get('/preparedb', function(req, res, next) {
   util.prepareDatabase();
-  res.send('Populating monolithic DB...');
+  res.send('Populating tenant DB...');
 });
 
 router.get('/getconfig', function(req, res, next) {
