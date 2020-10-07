@@ -78,6 +78,15 @@ function populateDB() {
     let cartCollection;
     let nextCartUserId=0;
 
+    let finished=0;
+
+    function checkFinished(){
+        finished++;
+        if(finished>=3){
+            console.log("DB Preparation finished\nTenant ready...");
+        }
+    }
+
 //--------insert Users--------
     getDatabaseCollection(userCollectionName, function (collection) {
             userCollection = collection;
@@ -97,6 +106,7 @@ function populateDB() {
             });
         } else {
             console.log("Users inserted");
+            checkFinished();
         }
     }
 
@@ -118,6 +128,7 @@ function populateDB() {
                 });
         } else {
             console.log("Products inserted");
+            checkFinished();
         }
     }
 
@@ -141,6 +152,7 @@ function populateDB() {
             });
         }else{
             console.log("Shopping Carts inserted");
+            checkFinished();
         }
     }
 }
