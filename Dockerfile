@@ -9,6 +9,9 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 RUN npm install
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.6/main' >> /etc/apk/repositories
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.6/community' >> /etc/apk/repositories
+RUN apk update
 RUN apk add --no-cache mongodb
 RUN mkdir -p /data/db && \
     chown -R mongodb /data/db
