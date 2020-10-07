@@ -26,7 +26,7 @@ function getDatabaseConnection(callback) {
     if (mongodbConn == null) {
         MongoClient.connect(dbUrl, function (err, connection) {
             assert.equal(null, err);
-            mongodbConn = connection;
+            mongodbConn = connection.db();
             console.log("Retrieved new MongoDB Connection");
             callback(mongodbConn);
         });
