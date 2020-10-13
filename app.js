@@ -17,9 +17,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/', index);
-app.use('/user', user);
-app.use('/product', product);
-app.use('/cart', cart);
+app.use('/:tenant', index);
+app.use('/:tenant/user', user);
+app.use('/:tenant/product', product);
+app.use('/:tenant/cart', cart);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

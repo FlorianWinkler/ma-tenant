@@ -7,7 +7,7 @@ const Cart = require("./Cart");
 const CartItem = require("./CartItem");
 
 const dbUrl = "mongodb://127.0.0.1:27017/tenantdb";
-// const dbUrl = "mongodb://10.0.0.206:27017/tenantdb";
+//const dbUrl = "mongodb://10.0.0.80:27017/tenantdb";
 const cartCollectionName="cart";
 const userCollectionName="user";
 const productCollectionName="product";
